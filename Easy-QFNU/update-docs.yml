@@ -1,0 +1,41 @@
+name: Update-docs
+
+on:
+  push:
+    branches:
+      - main # push to main branch
+  schedule:
+    - cron: "0 17 * * *" # Every day at 5:00 PM (UTC+8)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.11.4"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run Python script
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python update-docs.py #  Change here to the name of the Python script file
+
+      - name: Add changes to git
+        run: |
+          git add .
+
+      - name: Commit and push changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Update docs date #  Change here to the commit message
